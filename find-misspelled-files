@@ -1,0 +1,13 @@
+#!/bin/sh
+while read NAME; do
+        MISSPELLED=$( basename "$NAME" \
+                | sed -E 's/^[A-Z]+([A-Z])/\1/g' \
+                | sed -E 's/\.[^\.]*$//g' \
+                | sed -E 's/[^a-zA-Z]/|/g' | tr '|' '\n' \
+                | sed -E 's/([a-z])([A-Z])/\1|\2/g' | tr '|' '\n' \
+                | awk '/.{4,}/ { print }' \
+                | ispell -l )
+        if [ "$MISSPELLED" ]; then
+                echo "$NAME:" $( echo "$MISSPELLED" | tr '\n' ',' )
+        fi
+done
