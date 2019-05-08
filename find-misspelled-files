@@ -12,6 +12,10 @@ split_snake_case() {
 	sed -E 's/([a-z])([A-Z])/\1|\2/g' | tr '|' '\n'
 }
 
+split_abbreviation_snake_case() {
+	sed -E 's/([A-Z])([A-Z][a-z])/\1|\2/g' | tr '|' '\n'
+}
+
 split_non_alpha() {
 	sed -E 's/[^a-zA-Z]/|/g' | tr '|' '\n'
 }
@@ -25,6 +29,7 @@ while read NAME; do
 			| strip_objc_namespace \
 			| strip_file_extension \
 			| split_snake_case \
+			| split_abbreviation_snake_case \
 			| split_non_alpha \
 			| filter_short_words \
 			| ispell -l )
