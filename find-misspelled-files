@@ -9,11 +9,11 @@ strip_file_extension() {
 }
 
 split_snake_case() {
-	sed -E 's/[^a-zA-Z]/|/g' | tr '|' '\n'
+	sed -E 's/([a-z])([A-Z])/\1|\2/g' | tr '|' '\n'
 }
 
 split_non_alpha() {
-	sed -E 's/([a-z])([A-Z])/\1|\2/g' | tr '|' '\n'
+	sed -E 's/[^a-zA-Z]/|/g' | tr '|' '\n'
 }
 
 filter_short_words() {
