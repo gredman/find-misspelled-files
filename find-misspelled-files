@@ -1,13 +1,34 @@
 #!/bin/sh
+
+strip_objc_namespace() {
+	sed -E 's/^[A-Z]+([A-Z])/\1/g'
+}
+
+strip_file_extension() {
+	sed -E 's/\.[^\.]*$//g'
+}
+
+split_snake_case() {
+	sed -E 's/[^a-zA-Z]/|/g' | tr '|' '\n'
+}
+
+split_non_alpha() {
+	sed -E 's/([a-z])([A-Z])/\1|\2/g' | tr '|' '\n'
+}
+
+filter_short_words() {
+	awk '/.{4,}/ { print }' 
+}
+
 while read NAME; do
-        MISSPELLED=$( basename "$NAME" \
-                | sed -E 's/^[A-Z]+([A-Z])/\1/g' \
-                | sed -E 's/\.[^\.]*$//g' \
-                | sed -E 's/[^a-zA-Z]/|/g' | tr '|' '\n' \
-                | sed -E 's/([a-z])([A-Z])/\1|\2/g' | tr '|' '\n' \
-                | awk '/.{4,}/ { print }' \
-                | ispell -l )
-        if [ "$MISSPELLED" ]; then
-                echo "$NAME:" $( echo "$MISSPELLED" | tr '\n' ',' )
-        fi
+	MISSPELLED=$( basename "$NAME" \
+			| strip_objc_namespace \
+			| strip_file_extension \
+			| split_snake_case \
+			| split_non_alpha \
+			| filter_short_words \
+			| ispell -l )
+	if [ "$MISSPELLED" ]; then
+		echo "$NAME:" $( echo "$MISSPELLED" | tr '\n' ',' )
+	fi
 done
